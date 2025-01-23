@@ -33,9 +33,8 @@ The platform offers a curated collection of jokes tailored to different develope
 ### **Social Sharing Options**  
 - Users can share their favorite jokes on social media platforms, spreading the fun to others.
 
----
 
-## Tech Stack  
+## Tech Stack :
 
 **Front-End:**  
 - HTML  
@@ -50,7 +49,8 @@ The platform offers a curated collection of jokes tailored to different develope
 - MongoDB  
 
 **Hosting:**  
-- GitHub  
+- GitHub 
+
 
 
 
