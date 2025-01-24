@@ -1,0 +1,11 @@
+{
+  "name": "s74_so_called_tech_jokes",
+  "version": "1.0.0",
+  "description": "** So-Called Technical Jokes **",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
