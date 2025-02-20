@@ -78,3 +78,13 @@ The inspiration for **So-Called Technical Jokes** comes from a desire to combine
 - ✅ Committed all changes  
 - ✅ Pushed changes to GitHub  
 - ✅ Created a **Pull Request (PR)** for review 
+
+# ASAP Project - Backend  
+
+## Changes Made  
+
+### 1. **Updated `package.json`**
+- Added **Nodemon** for automatic server restart during development.
+- Added `start` and `dev` scripts:
+  - `npm start` → Runs the server normally.
+  - `npm run dev` → Runs the server with Nodemon.
