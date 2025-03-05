@@ -88,3 +88,5 @@ The inspiration for **So-Called Technical Jokes** comes from a desire to combine
 - Added `start` and `dev` scripts:
   - `npm start` → Runs the server normally.
   - `npm run dev` → Runs the server with Nodemon.
+
+  Deployed link: https://so-called-tech-joke.netlify.app/
