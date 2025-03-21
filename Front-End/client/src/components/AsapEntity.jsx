@@ -1,5 +1,4 @@
-/* eslint-disable react/prop-types */  // 👈 Add this line at the top to disable the warning
-
+/* eslint-disable react/prop-types */  
 const AsapEntity = ({ title = "Default Title", description = "Default Description" }) => {
     return (
       <div className="p-4 border border-gray-300 rounded-lg shadow-lg bg-white w-96 mt-6">
