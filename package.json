@@ -4,13 +4,16 @@
   "description": "** So-Called Technical Jokes **",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "vite build"
   },
-  
-  "author": "Rithik kumar",
+  "author": "Rithik Kumar",
   "license": "ISC",
   "keywords": [],
   "dependencies": {
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
+}

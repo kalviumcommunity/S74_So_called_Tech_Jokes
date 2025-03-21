@@ -1,0 +1,105 @@
+/* ===== App Background ===== */
+.app {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== Control Panel ===== */
+.control-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ===== Container ===== */
+.container {
+  background: black;
+  padding: 20px;
+  border: 4px solid;
+  border-radius: 12px;
+  box-shadow: 0 0 20px red;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ===== Input and Buttons ===== */
+.input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input[type="text"], input[type="color"] {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: darkred;
+}
+
+/* ===== Random Joke ===== */
+.random-joke {
+  margin: 20px 0;
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid red;
+  border-radius: 5px;
+}
+
+/* ===== Joke List ===== */
+.joke-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* ===== Joke Item ===== */
+.joke-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(255, 0, 0, 0.3);
+}
+
+/* ===== Delete Button ===== */
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff4d4f;
+  font-size: 20px;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #d9363e;
+}

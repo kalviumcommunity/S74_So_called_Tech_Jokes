@@ -63,3 +63,30 @@ The inspiration for **So-Called Technical Jokes** comes from a desire to combine
 3. Gain experience with modern frameworks like **ReactJS**, **Node.js**, and **MongoDB**.  
 4. Implement interactive features such as voting systems and content moderation.  
 5. Explore **UI/UX design principles** to create an engaging user experience.
+
+### Frontend (React)
+- ✅ Initialized a React app using **Vite** inside the `client/` folder
+- ✅ Installed dependencies:  
+  - `react-router-dom` (for routing)  
+  - `axios` (for API requests)  
+  - `dotenv` (for environment variables)  
+- ✅ Created a **Landing Page** to introduce the ASAP project  
+- ✅ Styled the landing page using **CSS with a red-gold gradient & neon effect**  
+
+### Git & Version Control
+- ✅ Created a **new branch** following naming conventions  
+- ✅ Committed all changes  
+- ✅ Pushed changes to GitHub  
+- ✅ Created a **Pull Request (PR)** for review 
+
+# ASAP Project - Backend  
+
+## Changes Made  
+
+### 1. **Updated `package.json`**
+- Added **Nodemon** for automatic server restart during development.
+- Added `start` and `dev` scripts:
+  - `npm start` → Runs the server normally.
+  - `npm run dev` → Runs the server with Nodemon.
+
+  Deployed link: https://so-called-tech-joke.netlify.app/
