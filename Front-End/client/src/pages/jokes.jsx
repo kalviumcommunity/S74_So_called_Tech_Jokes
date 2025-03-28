@@ -8,22 +8,41 @@ function Jokes({ setUser }) {
   const [jokes, setJokes] = useState([]);
   const [newJoke, setNewJoke] = useState("");
   const [randomJoke, setRandomJoke] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(""); // Store selected user
   const navigate = useNavigate();
 
-  // Fetch all jokes on load
+  // Fetch users for dropdown
   useEffect(() => {
-    axios.get("http://localhost:5000/api/jokes", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-    .then((res) => setJokes(res.data))
-    .catch((err) => console.error("Error fetching jokes:", err));
+    axios.get("http://localhost:5000/api/users")
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.error("Error fetching users:", err));
   }, []);
 
-  // Fetch a random joke
+  // Fetch jokes (filtered by user if selected)
+  useEffect(() => {
+    const fetchJokes = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/jokes", {
+          params: selectedUser ? { userId: selectedUser } : {},
+        });
+        setJokes(res.data);
+      } catch (error) {
+        console.error("Error fetching jokes:", error);
+      }
+    };
+    fetchJokes();
+  }, [selectedUser]); // Re-fetch when selectedUser changes
+
+  // Fetch a random joke (Filtered by user if selected)
   const fetchRandomJoke = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/jokes/random");
-      setRandomJoke(res.data.text);
+      const res = await axios.get("http://localhost:5000/api/jokes", {
+        params: selectedUser ? { userId: selectedUser } : {},
+      });
+      if (res.data.length === 0) return setRandomJoke("No jokes available!");
+      const randomJoke = res.data[Math.floor(Math.random() * res.data.length)];
+      setRandomJoke(randomJoke.text);
     } catch (error) {
       console.error("Error fetching random joke:", error);
     }
@@ -33,11 +52,12 @@ function Jokes({ setUser }) {
   const addJoke = async () => {
     if (!newJoke.trim()) return;
     try {
-      const res = await axios.post("http://localhost:5000/api/jokes",
+      const res = await axios.post(
+        "http://localhost:5000/api/jokes",
         { text: newJoke },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      setJokes([...jokes, res.data]);
+      setJokes([...jokes, res.data]); // Add new joke to the list
       setNewJoke("");
     } catch (error) {
       console.error("Error adding joke:", error);
@@ -58,9 +78,26 @@ function Jokes({ setUser }) {
       <div className="container">
         <h1>😂 Tech Joke Generator</h1>
 
+        {/* User Dropdown */}
+        <label>Select User:</label>
+        <select onChange={(e) => setSelectedUser(e.target.value)} value={selectedUser}>
+          <option value="">All Users</option>
+          {users.map((user) => (
+            <option key={user._id} value={user._id}>{user.username}</option>
+          ))}
+        </select>
+
         {/* Random Joke Section */}
         <button className="random-btn" onClick={fetchRandomJoke}>Get Random Joke</button>
         {randomJoke && <p className="random-joke">{randomJoke}</p>}
+
+        {/* Jokes List */}
+        <h2>Jokes</h2>
+        <ul>
+          {jokes.map((joke) => (
+            <li key={joke._id}>{joke.text} - <i>by {joke.created_by?.username || "Unknown"}</i></li>
+          ))}
+        </ul>
 
         {/* Add New Joke Section */}
         <h2>Add Your Own Joke</h2>
