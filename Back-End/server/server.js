@@ -3,24 +3,28 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // or your frontend domain
+  credentials: true, // allow credentials like cookies
+}));
+app.use(cookieParser());
 
-// ✅ Connect to MongoDB
+// ======================= CONNECT TO MONGO =======================
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    tls: true, // Ensure TLS is enabled
+    tls: true,
   })
-  .then(() => console.log("Connected to MongoDB ✅"))
+  .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// ======================= SCHEMAS & MODELS =======================
-// 🔹 User Schema
+// ======================= SCHEMAS =======================
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, unique: true, required: true },
@@ -30,10 +34,9 @@ const userSchema = new mongoose.Schema(
 );
 const User = mongoose.model("User", userSchema);
 
-// 🔹 Joke Schema
 const jokeSchema = new mongoose.Schema({
   text: { type: String, required: true },
-  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // Allows older jokes to be null
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -41,7 +44,7 @@ const Joke = mongoose.model("Joke", jokeSchema);
 
 // ======================= AUTH MIDDLEWARE =======================
 const verifyToken = (req, res, next) => {
-  const token = req.header("Authorization")?.split(" ")[1];
+  const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Access Denied" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -52,7 +55,8 @@ const verifyToken = (req, res, next) => {
 };
 
 // ======================= AUTH ROUTES =======================
-// 🔹 Register User
+
+// 🔹 Register
 app.post("/api/auth/register", async (req, res) => {
   const { username, password } = req.body;
 
@@ -64,14 +68,22 @@ app.post("/api/auth/register", async (req, res) => {
     const newUser = await User.create({ username, password: hashedPassword });
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token });
+
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 60 * 60 * 1000,
+      })
+      .json({ message: "User registered successfully" });
   } catch (error) {
     console.error("❌ Registration Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// 🔹 Login User
+// 🔹 Login
 app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -83,23 +95,35 @@ app.post("/api/auth/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token });
+
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 60 * 60 * 1000,
+      })
+      .json({ message: "Logged in successfully" });
   } catch (error) {
     console.error("❌ Login Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// 🔹 Logout
+app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("token").json({ message: "Logged out successfully" });
+});
+
 // ======================= JOKE ROUTES =======================
+
 // 🔹 Get all jokes (Filter by User)
 app.get("/api/jokes", async (req, res) => {
   try {
     const { userId } = req.query;
-    let query = userId ? { created_by: userId } : {}; // Filter by user if selected
-
+    const query = userId ? { created_by: userId } : {};
     const jokes = await Joke.find(query).populate("created_by", "username");
 
-    // Ensure 'created_by' exists, otherwise, default to "Unknown"
     const formattedJokes = jokes.map((joke) => ({
       _id: joke._id,
       text: joke.text,
@@ -114,17 +138,16 @@ app.get("/api/jokes", async (req, res) => {
   }
 });
 
-// 🔹 Get a random joke (Considering user filter)
+// 🔹 Get a random joke
 app.get("/api/jokes/random", async (req, res) => {
   try {
     const { userId } = req.query;
-    let query = userId ? { created_by: userId } : {}; // Filter by user if selected
-
+    const query = userId ? { created_by: userId } : {};
     const jokes = await Joke.find(query).populate("created_by", "username");
+
     if (jokes.length === 0) return res.json({ text: "No jokes available!" });
 
     const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-
     res.json({
       text: randomJoke.text,
       created_by: randomJoke.created_by ? randomJoke.created_by.username : "Unknown",
@@ -135,7 +158,7 @@ app.get("/api/jokes/random", async (req, res) => {
   }
 });
 
-// 🔹 Add a new joke (Requires Authentication)
+// 🔹 Add a new joke (Requires Auth)
 app.post("/api/jokes", verifyToken, async (req, res) => {
   try {
     const newJoke = new Joke({ text: req.body.text, created_by: req.userId });
