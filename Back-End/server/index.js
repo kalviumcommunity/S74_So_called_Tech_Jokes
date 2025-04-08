@@ -1,11 +1,11 @@
 import express from 'express';
-import db from './db.js'; // Import the database connection
+import db from './db.js';
 
 const app = express();
 app.use(express.json());
 
 app.get('/entities/:userId', async (req, res) => {
-    try {}
+    try {
         const { userId } = req.params;
         const [entities] = await db.query("SELECT * FROM entities WHERE created_by = ?", [userId]);
         res.json(entities);
