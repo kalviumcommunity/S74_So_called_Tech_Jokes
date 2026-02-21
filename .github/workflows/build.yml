@@ -1,0 +1,28 @@
+name: Build (Docker)
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push
+        run: |
+          IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[A-Z]' '[a-z]')
+          REGISTRY_IMAGE="ghcr.io/$IMAGE_NAME"
+          docker build -t $REGISTRY_IMAGE:${{ github.sha }} .
+          docker tag $REGISTRY_IMAGE:${{ github.sha }} $REGISTRY_IMAGE:latest
+          docker push $REGISTRY_IMAGE:latest
