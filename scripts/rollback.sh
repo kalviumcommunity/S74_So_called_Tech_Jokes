@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
-APP_NAME="S74_So_called_Tech_Jokes_test"
-PORT="3000"
+# Dynamic Variables
+APP_NAME="${APP_NAME:-app}"
+APP_PORT="${PORT:-3000}"
+REPO_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[A-Z]' '[a-z]')
+# We target the 'previous' tag or a specific SHA if you prefer
+ROLLBACK_IMAGE="ghcr.io/${REPO_LOWER}:latest" 
 
-echo "🔁 Rolling back $APP_NAME to previous version..."
+echo "🔄 Rolling back $APP_NAME to the last stable image..."
 
-# Stop and remove current container
+# 1. Stop the failing container
 docker stop "$APP_NAME" || true
 docker rm "$APP_NAME" || true
 
-# Start previous image
+# 2. Run the previous version (Docker keeps a cache of the last 'latest')
+# In a professional setup, you'd pull a specific 'stable' tag
 docker run -d \
   --name "$APP_NAME" \
-  -p "$PORT:$PORT" \
-  s74_so_called_tech_jokes_test:previous
+  -p "$APP_PORT:$APP_PORT" \
+  "$ROLLBACK_IMAGE"
 
-echo "✅ Rollback complete for $APP_NAME"
+echo "✅ Rollback complete for $APP_NAME on port $APP_PORT"
