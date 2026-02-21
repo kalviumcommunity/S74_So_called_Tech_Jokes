@@ -1,17 +1,26 @@
 name: Rollback
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy"]
+    types: [completed]
 
 jobs:
   rollback:
+    # Trigger only if the Deploy workflow failed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set execute permissions
-        run: chmod +x scripts/*.sh
-
-      - name: Rollback
-        run: bash scripts/rollback.sh
+      - name: Execute Universal Rollback
+        env:
+          APP_NAME: ${{ github.event.repository.name }}
+          PORT: ${{ vars.PORT || 3000 }}
+        run: |
+          chmod +x scripts/*.sh
+          bash scripts/rollback.sh
